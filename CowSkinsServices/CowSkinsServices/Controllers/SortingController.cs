@@ -9,14 +9,15 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CowSkinsService.Controllers
 {
+    [ApiController]
     [Route("api/[controller]/[action]")]
-    public class SortingController : Controller
+    public class SortingController : ControllerBase
     {
-        SkinsContext db;
+        SkinsContext _context;
 
         public SortingController(SkinsContext context)
         {
-            db = context;
+            _context = context;
         }
 
         //[HttpGet/*("{currentBatchNumber}")*/]
@@ -24,22 +25,22 @@ namespace CowSkinsService.Controllers
         [HttpGet("{batchNumber}")]
         public IEnumerable<SortingAdvancedView> GetCurrentBatchesSkins(int batchNumber)
         {
-            var currentBatchesSkins = db.Skin
-                .Join(db.Batch, skin => skin.IdBatch, batch => batch.IdBatch, (skin, batch) => new { skin, batch })
-                .Join(db.SkinType, s => s.skin.IdTypeSkin, skinType => skinType.IdTypeSkin, (s, skinType) => new { s, skinType })
-                .Join(db.Pallet, s => s.s.skin.IdPallet, pallet => pallet.IdPallet, (s, pallet) => new { s, pallet })
-                .Where(idbatch => idbatch.s.s.batch.IdBatch == batchNumber)
+            var currentBatchesSkins = _context.Skin
+                .Join(_context.Batch, skin => skin.BatchID, batch => batch.BatchID, (skin, batch) => new { skin, batch })
+                .Join(_context.SkinType, s => s.skin.TypeSkinID, skinType => skinType.TypeSkinID, (s, skinType) => new { s, skinType })
+                .Join(_context.Pallet, s => s.s.skin.PalletID, pallet => pallet.PalletID, (s, pallet) => new { s, pallet })
+                .Where(idbatch => idbatch.s.s.batch.BatchID == batchNumber)
                 .Select(sortingSelect => new SortingAdvancedView()
                 {
-                    Sort = sortingSelect.s.s.skin.IdSort,
+                    Sort = sortingSelect.s.s.skin.SortID,
                     Brutto = sortingSelect.s.s.skin.Brutto,
                     Netto = sortingSelect.s.s.skin.Netto,
                     Discount = sortingSelect.s.s.skin.Discount,
                     SkinTypeLabel = sortingSelect.s.skinType.TypeSkinLabel,
                     MaximumCountSkin = sortingSelect.s.skinType.MaximumCountSkin,
-                    IdBatch = sortingSelect.s.s.batch.IdBatch,
-                    IdSkin = sortingSelect.s.s.skin.IdSkin,
-                    IdPallet = sortingSelect.pallet.IdPallet,
+                    BatchID = sortingSelect.s.s.batch.BatchID,
+                    SkinID = sortingSelect.s.s.skin.SkinID,
+                    PalletID = sortingSelect.pallet.PalletID,
                     CurrentCount = sortingSelect.pallet.CurrentCountSkins
                 });
 
@@ -51,47 +52,47 @@ namespace CowSkinsService.Controllers
         [HttpGet]
         public IQueryable GetOpenBatches()
         {
-            var openBatches = db.Batch.Where(b => b.BatchStatus == "Открыта")
-                   .Select(s => s.IdBatch);
+            var openBatches = _context.Batch.Where(b => b.BatchStatus == "Открыта")
+                   .Select(s => s.BatchID);
             return openBatches;
         }
 
         [HttpGet("{weight},{idconfiguration}")]
         public IQueryable GetConfigurationTypeSkin(float weight, int idconfiguration)
         {
-            var typeSkin = db.SkinType.Where(st => st.MinimumWeight <= Convert.ToDecimal(weight) && st.MaximumWeight >= Convert.ToDecimal(weight) && st.IdConfiguration == idconfiguration)
-                .Select(st => st.IdTypeSkin);
+            var typeSkin = _context.SkinType.Where(st => st.MinimumWeight <= Convert.ToDecimal(weight) && st.MaximumWeight >= Convert.ToDecimal(weight) && st.IdConfiguration == idconfiguration)
+                .Select(st => st.TypeSkinID);
             return typeSkin;
         }
 
         [HttpGet("{idtypeskin}")]
         public IQueryable GetTypeSkinPallet(int idtypeskin)
         {
-            var IDpallet = db.Pallet.Where(p => p.Status == "Открыт" && p.IdTypeSkin == idtypeskin)
-                .Select(p => p.IdPallet);
+            var IDpallet = _context.Pallet.Where(p => p.Status == "Открыт" && p.TypeSkinID == idtypeskin)
+                .Select(p => p.PalletID);
             return IDpallet;
         }
 
         [HttpGet("{batchNumber}")]
         public int GetSchemeID(int batchNumber)
         {
-            var IDScheme = db.Batch.Where(b => b.IdBatch == batchNumber)
-                .Select(b => b.IdScheme).ToList();
+            var IDScheme = _context.Batch.Where(b => b.BatchID == batchNumber)
+                .Select(b => b.SchemeID).ToList();
             return IDScheme.First().Value;
         }
 
         [HttpGet("{schemeID}")]
         public IQueryable GetEnabledTypeSkins(int schemeID)
         {
-            var IDTypeSkin = db.SchemeType.Where(st => st.IdScheme == schemeID)
-                .Select(st => st.IdTypeSkin);
+            var IDTypeSkin = _context.SchemeType.Where(st => st.SchemeID == schemeID)
+                .Select(st => st.TypeSkinID);
             return IDTypeSkin;
         }
 
         [HttpGet("{palletID}")]
         public int GetPalletCountSkins(int palletID)
         {
-            var CurrentCount = db.Pallet.Where(p => p.IdPallet == palletID)
+            var CurrentCount = _context.Pallet.Where(p => p.PalletID == palletID)
                 .Select(p => p.CurrentCountSkins).ToList();
             return CurrentCount.FirstOrDefault().Value;
         }
@@ -99,7 +100,7 @@ namespace CowSkinsService.Controllers
         [HttpGet("{palletID}")]
         public DateTime GetPalletOpeningDate(int palletID)
         {
-            var OpeningDate = db.Pallet.Where(p => p.IdPallet == palletID)
+            var OpeningDate = _context.Pallet.Where(p => p.PalletID == palletID)
                 .Select(p => p.OpeningDate).ToList();
             return OpeningDate.FirstOrDefault().Value;
         }
@@ -107,7 +108,7 @@ namespace CowSkinsService.Controllers
         [HttpGet("{typeskinID}")]
         public int GetMaxCountSkins(int typeskinID)
         {
-            var MaxCount = db.SkinType.Where(st => st.IdTypeSkin == typeskinID)
+            var MaxCount = _context.SkinType.Where(st => st.TypeSkinID == typeskinID)
                 .Select(st => st.MaximumCountSkin).ToList();
             return MaxCount.FirstOrDefault().Value;
         }
@@ -115,15 +116,15 @@ namespace CowSkinsService.Controllers
         [HttpGet("{configName}")]
         public int GetConfigurationID(string configName)
         {
-            var IDConfiguration = db.Configuration.Where(c => c.ConfigurationLabel == configName)
-                .Select(c => c.IdConfiguration).ToList();
+            var IDConfiguration = _context.Configuration.Where(c => c.ConfigurationLabel == configName)
+                .Select(c => c.ConfigurationID).ToList();
             return IDConfiguration.FirstOrDefault();
         }
 
         [HttpGet("{batchID}")]
         public IEnumerable<Batch> GetBatch(int batchID)
         {
-            var CurrentBatch = db.Batch.Where(b => b.IdBatch == batchID);
+            var CurrentBatch = _context.Batch.Where(b => b.BatchID == batchID);
             return CurrentBatch;
         }
     }

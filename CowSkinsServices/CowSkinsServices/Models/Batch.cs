@@ -8,23 +8,14 @@ namespace CowSkinsService.Models
     [Table("Batch")]
     public partial class Batch
     {
-        public Batch()
-        {
-            Skin = new HashSet<Skin>();
-        }
-
         [Key]
-        public int IdBatch { get; set; }
+        public int BatchID { get; set; }
         public DateTime? OpeningDate { get; set; }
         public DateTime? ClosingDate { get; set; }
         public string BatchStatus { get; set; }
         public int? SortingCount { get; set; }
         public int? DebitCount { get; set; }
-        public int? IdProvider { get; set; }
-        public int? IdScheme { get; set; }
-
-        public virtual ICollection<Skin> Skin { get; set; }
-        public virtual Provider IdProviderNavigation { get; set; }
-        public virtual SortingScheme IdSchemeNavigation { get; set; }
+        public int? ProviderID { get; set; }
+        public int? SchemeID { get; set; }
     }
 }

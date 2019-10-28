@@ -9,12 +9,8 @@ namespace CowSkinsService.Models
     public partial class SchemeType
     {
         [Key]
-
-        public int IdSchemeType { get; set; }
-        public int? IdScheme { get; set; }
-        public int? IdTypeSkin { get; set; }
-
-        public virtual SortingScheme IdSchemeNavigation { get; set; }
-        public virtual SkinType IdTypeSkinNavigation { get; set; }
+        public int SchemeTypeID { get; set; }
+        public int? SchemeID { get; set; }
+        public int? TypeSkinID { get; set; }
     }
 }

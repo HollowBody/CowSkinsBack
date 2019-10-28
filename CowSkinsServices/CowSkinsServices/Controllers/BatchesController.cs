@@ -10,26 +10,27 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CowSkinsService.Controllers
 {
+    [ApiController]
     [Route("api/[controller]/[action]")]
-    public class BatchesController : Controller
+    public class BatchesController : ControllerBase
     {
-        SkinsContext db;
+        SkinsContext _context;
         public BatchesController(SkinsContext context)
         {
-            db = context;
+            _context = context;
         }
         // GET: api/values
         [HttpGet]
         public IEnumerable<Batch> Get()
         {
-            return db.Batch.ToList();
+            return _context.Batch.ToList();
         }
 
         // GET api/values/5
         [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
-            Batch batch = db.Batch.FirstOrDefault(x => x.IdBatch == id);
+            Batch batch = _context.Batch.FirstOrDefault(x => x.BatchID == id);
             if (batch == null)
                 return NotFound();
             return new ObjectResult(batch);
@@ -44,8 +45,8 @@ namespace CowSkinsService.Controllers
                 return BadRequest();
             }
 
-            db.Batch.Add(batch);
-            db.SaveChanges();
+            _context.Batch.Add(batch);
+            _context.SaveChanges();
             return Ok(batch);
         }
 
@@ -57,13 +58,13 @@ namespace CowSkinsService.Controllers
             {
                 return BadRequest();
             }
-            if (!db.Batch.Any(x => x.IdBatch == batch.IdBatch))
+            if (!_context.Batch.Any(x => x.BatchID == batch.BatchID))
             {
                 return NotFound();
             }
 
-            db.Update(batch);
-            db.SaveChanges();
+            _context.Update(batch);
+            _context.SaveChanges();
             return Ok(batch);
         }
 
@@ -71,20 +72,20 @@ namespace CowSkinsService.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            Batch batch = db.Batch.FirstOrDefault(x => x.IdBatch == id);
+            Batch batch = _context.Batch.FirstOrDefault(x => x.BatchID == id);
             if (batch == null)
             {
                 return NotFound();
             }
-            db.Batch.Remove(batch);
-            db.SaveChanges();
+            _context.Batch.Remove(batch);
+            _context.SaveChanges();
             return Ok(batch);
         }
         
         [HttpGet("{batchID}")]
         public DateTime GetBatchOpeningDate(int batchID)
         {
-            var OpeningDate = db.Batch.Where(b => b.IdBatch == batchID)
+            var OpeningDate = _context.Batch.Where(b => b.BatchID == batchID)
                 .Select(b => b.OpeningDate).ToList();
             return OpeningDate.FirstOrDefault().Value;
         }
@@ -92,7 +93,7 @@ namespace CowSkinsService.Controllers
         [HttpGet("{batchID}")]
         public IQueryable GetBatchDebitCount(int batchID)
         {
-            var DebitCount = db.Batch.Where(b => b.IdBatch == batchID)
+            var DebitCount = _context.Batch.Where(b => b.BatchID == batchID)
                 .Select(b => b.DebitCount);
             return DebitCount;
         }
@@ -100,16 +101,16 @@ namespace CowSkinsService.Controllers
         [HttpGet("{batchID}")]
         public int GetBatchProviderID(int batchID)
         {
-            var ProviderId = db.Batch.Where(b => b.IdBatch == batchID)
-                .Select(b => b.IdProvider).ToList();
+            var ProviderId = _context.Batch.Where(b => b.BatchID == batchID)
+                .Select(b => b.ProviderID).ToList();
             return ProviderId.FirstOrDefault().Value;
         }
 
         [HttpGet]
         public IQueryable GetClosedBatchesID()
         {
-            var BatchesID = db.Batch.Where(b => b.BatchStatus == "Закрыта")
-                .Select(b => b.IdBatch);
+            var BatchesID = _context.Batch.Where(b => b.BatchStatus == "Закрыта")
+                .Select(b => b.BatchID);
             return BatchesID;
         }
 

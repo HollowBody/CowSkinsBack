@@ -9,14 +9,11 @@ namespace CowSkinsService.Models
     public partial class CostJournal
     {
         [Key]
-        public int IdCost { get; set; }
+        public int CostID { get; set; }
         public DateTime? CostDate { get; set; }
         public decimal? SkinPrice { get; set; }
-        public int? IdTypeSkin { get; set; }
-        public int? IdSort { get; set; }
-        public int? IdBatch { get; set; }
-
-        public virtual Sorts IdSortNavigation { get; set; }
-        public virtual SkinType IdTypeSkinNavigation { get; set; }
+        public int? TypeSkinID { get; set; }
+        public int? SortID { get; set; }
+        public int? BatchID { get; set; }
     }
 }

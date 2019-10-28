@@ -10,8 +10,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore.SqlServer;
+using Swashbuckle.AspNetCore.Swagger;
+using System.Configuration;
 
 namespace CowSkinsService
 {
@@ -28,7 +31,8 @@ namespace CowSkinsService
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
-
+            services.AddDbContext<SkinsContext>(opt =>
+                opt.UseSqlServer(Configuration.GetConnectionString("SkinsDatabase")));
             services.AddControllers();
         }
 
@@ -45,17 +49,12 @@ namespace CowSkinsService
             }
 
             app.UseHttpsRedirection();
-
             app.UseRouting();
-
             app.UseAuthorization();
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-            });
-
-           app.UseMvc();
+            });           
         }
     }
 }

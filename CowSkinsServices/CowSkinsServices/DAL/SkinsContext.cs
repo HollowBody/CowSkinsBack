@@ -24,15 +24,15 @@ namespace CowSkinsService.DAL
         public virtual DbSet<SortingScheme> SortingScheme { get; set; }
         public virtual DbSet<Sorts> Sorts { get; set; }
 
-        protected SkinsContext(DbContextOptions<SkinsContext> options): 
+        public SkinsContext(DbContextOptions<SkinsContext> options): 
             base(options) {
         }
-
+        
         public static SkinsContext Create()
         {
             var optionsBuilder = new DbContextOptionsBuilder<SkinsContext>()
                 .UseSqlServer(ConfigurationManager.ConnectionStrings["SkinsDatabase"].ConnectionString)
-                .UseQueryTrackingBehavior(QueryTrackingBehavior.TrackAll);
+                .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
 
             return new SkinsContext(optionsBuilder.Options);
         }

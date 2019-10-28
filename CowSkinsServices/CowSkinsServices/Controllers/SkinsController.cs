@@ -10,26 +10,27 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CowSkinsService.Controllers
 {
+    [ApiController]
     [Route("api/[controller]/[action]")]
-    public class SkinsController : Controller
+    public class SkinsController : ControllerBase
     {
-        SkinsContext db;
+        SkinsContext _context;
         public SkinsController(SkinsContext context)
         {
-            db = context;
+            _context = context;
         }
         // GET: api/values
         [HttpGet]
         public IEnumerable<Skin> Get()
         {
-            return db.Skin.ToList();
+            return _context.Skin.ToList();
         }
 
         // GET api/values/5
         [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
-            Skin skin = db.Skin.FirstOrDefault(x => x.IdSkin == id);
+            Skin skin = _context.Skin.FirstOrDefault(x => x.SkinID == id);
             if (skin == null)
                 return NotFound();
             return new ObjectResult(skin);
@@ -38,7 +39,7 @@ namespace CowSkinsService.Controllers
         [HttpGet]
         public IActionResult GetLast()
         {
-            Skin skin = db.Skin.LastOrDefault();
+            Skin skin = _context.Skin.LastOrDefault();
             if (skin == null)
                 return NotFound();
             return new ObjectResult(skin);
@@ -53,8 +54,8 @@ namespace CowSkinsService.Controllers
                 return BadRequest();
             }
 
-            db.Skin.Add(skin);
-            db.SaveChanges();
+            _context.Skin.Add(skin);
+            _context.SaveChanges();
             return Ok(skin);
         }
 
@@ -68,20 +69,20 @@ namespace CowSkinsService.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            Skin skin = db.Skin.FirstOrDefault(x => x.IdSkin == id);
+            Skin skin = _context.Skin.FirstOrDefault(x => x.SkinID == id);
             if (skin == null)
             {
                 return NotFound();
             }
-            db.Skin.Remove(skin);
-            db.SaveChanges();
+            _context.Skin.Remove(skin);
+            _context.SaveChanges();
             return Ok(skin);
         }
 
         [HttpGet("{batchID}")]
         public IEnumerable<Skin> GetSkinsForReport(int batchID)
         {
-            var skins = db.Skin.Where(s => s.IdBatch == batchID);
+            var skins = _context.Skin.Where(s => s.BatchID == batchID);
             return skins;
         }
     }

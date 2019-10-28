@@ -10,26 +10,27 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CowSkinsService.Controllers
 {
+    [ApiController]
     [Route("api/[controller]/[action]")]
-    public class SkinTypesController : Controller
+    public class SkinTypesController : ControllerBase
     {
-        SkinsContext db;
+        SkinsContext _context;
         public SkinTypesController(SkinsContext context)
         {
-            db = context;
+            _context = context;
         }
         // GET: api/values
         [HttpGet]
         public IEnumerable<SkinType> Get()
         {
-            return db.SkinType.ToList();
+            return _context.SkinType.ToList();
         }
 
         // GET api/values/5
         [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
-            SkinType skinType = db.SkinType.FirstOrDefault(x => x.IdTypeSkin == id);
+            SkinType skinType = _context.SkinType.FirstOrDefault(x => x.TypeSkinID == id);
             if (skinType == null)
                 return NotFound();
             return new ObjectResult(skinType);
@@ -38,7 +39,7 @@ namespace CowSkinsService.Controllers
         [HttpGet("{typeskinID}")]
         public IQueryable GetTypeSkinsLabelById(int typeskinID)
         {
-            var TypeSkinLabel = db.SkinType.Where(st => st.IdTypeSkin == typeskinID)
+            var TypeSkinLabel = _context.SkinType.Where(st => st.TypeSkinID == typeskinID)
                 .Select(st => st.TypeSkinLabel);
             return TypeSkinLabel;
         }
@@ -52,8 +53,8 @@ namespace CowSkinsService.Controllers
                 return BadRequest();
             }
 
-            db.SkinType.Add(skinType);
-            db.SaveChanges();
+            _context.SkinType.Add(skinType);
+            _context.SaveChanges();
             return Ok(skinType);
         }
 
@@ -67,13 +68,13 @@ namespace CowSkinsService.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            SkinType skinType = db.SkinType.FirstOrDefault(x => x.IdTypeSkin == id);
+            SkinType skinType = _context.SkinType.FirstOrDefault(x => x.TypeSkinID == id);
             if (skinType == null)
             {
                 return NotFound();
             }
-            db.SkinType.Remove(skinType);
-            db.SaveChanges();
+            _context.SkinType.Remove(skinType);
+            _context.SaveChanges();
             return Ok(skinType);
         }
     }

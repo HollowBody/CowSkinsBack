@@ -10,26 +10,27 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CowSkinsService.Controllers
 {
+    [ApiController]
     [Route("api/[controller]/[action]")]
-    public class SendsController : Controller
+    public class SendsController : ControllerBase
     {
-        SkinsContext db;
+        SkinsContext _context;
         public SendsController(SkinsContext context)
         {
-            db = context;
+            _context = context;
         }
         // GET: api/values
         [HttpGet]
         public IEnumerable<Send> Get()
         {
-            return db.Send.ToList();
+            return _context.Send.ToList();
         }
 
         // GET api/values/5
         [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
-            Send send = db.Send.FirstOrDefault(x => x.IdSend == id);
+            Send send = _context.Send.FirstOrDefault(x => x.SendID == id);
             if (send == null)
                 return NotFound();
             return new ObjectResult(send);
@@ -44,8 +45,8 @@ namespace CowSkinsService.Controllers
                 return BadRequest();
             }
 
-            db.Send.Add(send);
-            db.SaveChanges();
+            _context.Send.Add(send);
+            _context.SaveChanges();
             return Ok(send);
         }
 
@@ -59,13 +60,13 @@ namespace CowSkinsService.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            Send send = db.Send.FirstOrDefault(x => x.IdSend == id);
+            Send send = _context.Send.FirstOrDefault(x => x.SendID == id);
             if (send == null)
             {
                 return NotFound();
             }
-            db.Send.Remove(send);
-            db.SaveChanges();
+            _context.Send.Remove(send);
+            _context.SaveChanges();
             return Ok(send);
         }
     }

@@ -7,7 +7,7 @@ namespace CowSkinsService.Models
 {
     public class ProviderAdvancedView
     {
-        public int IdProvider { get; set; }
+        public int ProviderID { get; set; }
         public string ProviderLabel { get; set; }
     }
 }

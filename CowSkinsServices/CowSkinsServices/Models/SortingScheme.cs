@@ -5,20 +5,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CowSkinsService.Models
 {
-    [Table("SkinType")]
+    [Table("SortingScheme")]
     public partial class SortingScheme
     {
-        public SortingScheme()
-        {
-            Batch = new HashSet<Batch>();
-            SchemeType = new HashSet<SchemeType>();
-        }
-
         [Key]
-        public int IdScheme { get; set; }
+        public int SchemeID { get; set; }
         public string SchemeLabel { get; set; }
-
-        public virtual ICollection<Batch> Batch { get; set; }
-        public virtual ICollection<SchemeType> SchemeType { get; set; }
     }
 }

@@ -10,26 +10,27 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CowSkinsService.Controllers
 {
+    [ApiController]
     [Route("api/[controller]/[action]")]
-    public class AdresseesController : Controller
+    public class AdresseesController : ControllerBase
     {
-        SkinsContext db;
+        SkinsContext _context;
         public AdresseesController(SkinsContext context)
         {
-            db = context;
+            _context = context;
         }
         // GET: api/values
         [HttpGet]
         public IEnumerable<Adressee> Get()
         {
-            return db.Adressee.ToList();
+            return _context.Adressee.ToList();
         }
 
         // GET api/values/5
         [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
-            Adressee adressee = db.Adressee.FirstOrDefault(x => x.IdAdressee == id);
+            Adressee adressee = _context.Adressee.FirstOrDefault(x => x.AdresseeID == id);
             if (adressee == null)
                 return NotFound();
             return new ObjectResult(adressee);
@@ -44,8 +45,8 @@ namespace CowSkinsService.Controllers
                 return BadRequest();
             }
 
-            db.Adressee.Add(adressee);
-            db.SaveChanges();
+            _context.Adressee.Add(adressee);
+            _context.SaveChanges();
             return Ok(adressee);
         }
 
@@ -57,13 +58,13 @@ namespace CowSkinsService.Controllers
             {
                 return BadRequest();
             }
-            if (!db.Adressee.Any(x => x.IdAdressee == adressee.IdAdressee))
+            if (!_context.Adressee.Any(x => x.AdresseeID == adressee.AdresseeID))
             {
                 return NotFound();
             }
 
-            db.Update(adressee);
-            db.SaveChanges();
+            _context.Update(adressee);
+            _context.SaveChanges();
             return Ok(adressee);
         }
 
@@ -71,13 +72,13 @@ namespace CowSkinsService.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            Adressee adressee = db.Adressee.FirstOrDefault(x => x.IdAdressee == id);
+            Adressee adressee = _context.Adressee.FirstOrDefault(x => x.AdresseeID == id);
             if (adressee == null)
             {
                 return NotFound();
             }
-            db.Adressee.Remove(adressee);
-            db.SaveChanges();
+            _context.Adressee.Remove(adressee);
+            _context.SaveChanges();
             return Ok(adressee);
         }
     }

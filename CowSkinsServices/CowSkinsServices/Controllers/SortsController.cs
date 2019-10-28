@@ -10,26 +10,27 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CowSkinsService.Controllers
 {
+    [ApiController]
     [Route("api/[controller]/[action]")]
-    public class SortsController : Controller
+    public class SortsController : ControllerBase
     {
-        SkinsContext db;
+        SkinsContext _context;
         public SortsController(SkinsContext context)
         {
-            db = context;
+            _context = context;
         }
         // GET: api/values
         [HttpGet]
         public IEnumerable<Sorts> Get()
         {
-            return db.Sorts.ToList();
+            return _context.Sorts.ToList();
         }
 
         // GET api/values/5
         [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
-            Sorts sorts = db.Sorts.FirstOrDefault(x => x.IdSort == id);
+            Sorts sorts = _context.Sorts.FirstOrDefault(x => x.SortID == id);
             if (sorts == null)
                 return NotFound();
             return new ObjectResult(sorts);
@@ -45,8 +46,8 @@ namespace CowSkinsService.Controllers
                 return BadRequest();
             }
 
-            db.Sorts.Add(sorts);
-            db.SaveChanges();
+            _context.Sorts.Add(sorts);
+            _context.SaveChanges();
             return Ok(sorts);
         }
 
@@ -60,13 +61,13 @@ namespace CowSkinsService.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            Sorts sorts = db.Sorts.FirstOrDefault(x => x.IdSort == id);
+            Sorts sorts = _context.Sorts.FirstOrDefault(x => x.SortID == id);
             if (sorts == null)
             {
                 return NotFound();
             }
-            db.Sorts.Remove(sorts);
-            db.SaveChanges();
+            _context.Sorts.Remove(sorts);
+            _context.SaveChanges();
             return Ok(sorts);
         }
     }

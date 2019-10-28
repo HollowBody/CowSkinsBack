@@ -10,26 +10,27 @@ using CowSkinsService.DAL;
 
 namespace CowSkinsService.Controllers
 {
+    [ApiController]
     [Route("api/[controller]/[action]")]
-    public class ProvidersController : Controller
+    public class ProvidersController : ControllerBase
     {
-        SkinsContext db;
+        SkinsContext _context;
         public ProvidersController(SkinsContext context)
         {
-            db = context;
+            _context = context;
         }
         // GET: api/values
         [HttpGet]
         public IEnumerable<Provider> GetAll()
         {
-            return db.Provider.ToList();
+            return _context.Provider.ToList();
         }
 
         // GET api/values/5
         [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
-            Provider providrer = db.Provider.FirstOrDefault(x => x.IdProvider == id);
+            Provider providrer = _context.Provider.FirstOrDefault(x => x.ProviderID == id);
             if (providrer == null)
                 return NotFound();
             return new ObjectResult(providrer);
@@ -44,8 +45,8 @@ namespace CowSkinsService.Controllers
                 return BadRequest();
             }
 
-            db.Provider.Add(provider);
-            db.SaveChanges();
+            _context.Provider.Add(provider);
+            _context.SaveChanges();
             return Ok(provider);
         }
 
@@ -59,13 +60,13 @@ namespace CowSkinsService.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            Provider provider = db.Provider.FirstOrDefault(x => x.IdProvider == id);
+            Provider provider = _context.Provider.FirstOrDefault(x => x.ProviderID == id);
             if (provider == null)
             {
                 return NotFound();
             }
-            db.Provider.Remove(provider);
-            db.SaveChanges();
+            _context.Provider.Remove(provider);
+            _context.SaveChanges();
             return Ok(provider);
         }
     }

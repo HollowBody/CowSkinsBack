@@ -10,26 +10,27 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CowSkinsService.Controllers
 {
+    [ApiController]
     [Route("api/[controller]/[action]")]
-    public class ConfigurationsController : Controller
+    public class ConfigurationsController : ControllerBase
     {
-        SkinsContext db;
+        SkinsContext _context;
         public ConfigurationsController(SkinsContext context)
         {
-            db = context;
+            _context = context;
         }
         // GET: api/values
         [HttpGet]
         public IEnumerable<Configuration> Get()
         {
-            return db.Configuration.ToList();
+            return _context.Configuration.ToList();
         }
 
         // GET api/values/5
         [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
-            Configuration configuration = db.Configuration.FirstOrDefault(x => x.IdConfiguration == id);
+            Configuration configuration = _context.Configuration.FirstOrDefault(x => x.ConfigurationID == id);
             if (configuration == null)
                 return NotFound();
             return new ObjectResult(configuration);
@@ -44,8 +45,8 @@ namespace CowSkinsService.Controllers
                 return BadRequest();
             }
 
-            db.Configuration.Add(configuration);
-            db.SaveChanges();
+            _context.Configuration.Add(configuration);
+            _context.SaveChanges();
             return Ok(configuration);
         }
 
@@ -59,13 +60,13 @@ namespace CowSkinsService.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            Configuration configuration = db.Configuration.FirstOrDefault(x => x.IdConfiguration == id);
+            Configuration configuration = _context.Configuration.FirstOrDefault(x => x.ConfigurationID == id);
             if (configuration == null)
             {
                 return NotFound();
             }
-            db.Configuration.Remove(configuration);
-            db.SaveChanges();
+            _context.Configuration.Remove(configuration);
+            _context.SaveChanges();
             return Ok(configuration);
         }
     }

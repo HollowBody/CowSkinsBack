@@ -10,19 +10,20 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CowSkinsService.Controllers
 {
+    [ApiController]
     [Route("api/[controller]/[action]")]
-    public class SortingSchemesController : Controller
+    public class SortingSchemesController : ControllerBase
     {
-        SkinsContext db;
+        SkinsContext _context;
         public SortingSchemesController(SkinsContext context)
         {
-            db = context;
+            _context = context;
         }
         // GET: api/values
         [HttpGet]
         public IEnumerable<SortingScheme> Get()
         {
-            return db.SortingScheme.ToList();
+            return _context.SortingScheme.ToList();
         }
 
         // GET api/values/5
@@ -30,7 +31,7 @@ namespace CowSkinsService.Controllers
         public IActionResult Get(int id)
         {
 
-            SortingScheme sortingScheme = db.SortingScheme.FirstOrDefault(x => x.IdScheme == id);
+            SortingScheme sortingScheme = _context.SortingScheme.FirstOrDefault(x => x.SchemeID == id);
             if (sortingScheme == null)
                 return NotFound();
             return new ObjectResult(sortingScheme);
@@ -39,7 +40,7 @@ namespace CowSkinsService.Controllers
         [HttpGet]
         public int GetLastSchemeId()
         {
-            var idScheme = db.SortingScheme.Select(s => s.IdScheme).ToList();
+            var idScheme = _context.SortingScheme.Select(s => s.SchemeID).ToList();
             return idScheme.LastOrDefault();
         }
 
@@ -52,8 +53,8 @@ namespace CowSkinsService.Controllers
                 return BadRequest();
             }
 
-            db.SortingScheme.Add(sortingScheme);
-            db.SaveChanges();
+            _context.SortingScheme.Add(sortingScheme);
+            _context.SaveChanges();
             return Ok(sortingScheme);
         }
 

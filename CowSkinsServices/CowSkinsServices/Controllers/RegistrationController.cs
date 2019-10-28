@@ -10,20 +10,21 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CowSkinsService.Controllers
 {
+    [ApiController]
     [Route("api/[controller]/[action]")]
-    public class RegistrationController : Controller
+    public class RegistrationController : ControllerBase
     {
-        SkinsContext db;
+        SkinsContext _context;
         public RegistrationController(SkinsContext context)
         {
-            db = context;
+            _context = context;
         }
         [HttpGet]
         public IEnumerable<ProviderAdvancedView> GetProviders()
         {
-            var providers = db.Provider.Select(providerSelect => new ProviderAdvancedView
+            var providers = _context.Provider.Select(providerSelect => new ProviderAdvancedView
             {
-                IdProvider = providerSelect.IdProvider,
+                ProviderID = providerSelect.ProviderID,
                 ProviderLabel = providerSelect.ProviderLabel
             });
             return providers.ToList();

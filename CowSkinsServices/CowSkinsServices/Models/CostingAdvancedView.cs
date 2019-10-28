@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace CowSkinsService.Models
+﻿namespace KRSClientApplication.Models
 {
-    [Table("Skin")]
-    public partial class Skin
+    public class CostingAdvancedView
     {
-        [Key]
         public int SkinID { get; set; }
         public int? SortID { get; set; }
         public float? Brutto { get; set; }
@@ -18,5 +11,6 @@ namespace CowSkinsService.Models
         public int? TypeSkinID { get; set; }
         public int? ConfigurationID { get; set; }
         public int? PalletID { get; set; }
+        public string SkinTypeLabel { get; set; }
     }
 }

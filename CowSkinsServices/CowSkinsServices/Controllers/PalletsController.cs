@@ -11,26 +11,27 @@ using CowSkinsService.DAL;
 
 namespace CowSkinsService.Controllers
 {
+    [ApiController]
     [Route("api/[controller]/[action]")]
-    public class PalletsController : Controller
+    public class PalletsController : ControllerBase
     {
-        private SkinsContext _db;
+        private SkinsContext _context;
         public PalletsController(SkinsContext context)
         {
-            _db = context;
+            _context = context;
         }
         // GET: api/values
         [HttpGet]
         public IEnumerable<Pallet> Get()
         {
-            return _db.Pallet.ToList();
+            return _context.Pallet.ToList();
         }
 
         // GET api/values/5
         [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
-            Pallet pallet = _db.Pallet.FirstOrDefault(x => x.IdPallet == id);
+            Pallet pallet = _context.Pallet.FirstOrDefault(x => x.PalletID == id);
             if (pallet == null)
                 return NotFound();
             return new ObjectResult(pallet);
@@ -39,18 +40,18 @@ namespace CowSkinsService.Controllers
         [HttpGet("{status}")]
         public IEnumerable<PalletAdvancedView> GetWithStatus(string status)
         {
-            var pallet = _db.Pallet
-                .Join(_db.SkinType, p => p.IdTypeSkin, skinType => skinType.IdTypeSkin, (p, skinType) => new { p, skinType })
+            var pallet = _context.Pallet
+                .Join(_context.SkinType, p => p.TypeSkinID, skinType => skinType.TypeSkinID, (p, skinType) => new { p, skinType })
                 .Where(p => p.p.Status == status)
                 .Select(palletSelect => new PalletAdvancedView()
                 {
-                    IdPallet = palletSelect.p.IdPallet,
+                    PalletID = palletSelect.p.PalletID,
                     OpeningDate = palletSelect.p.OpeningDate,
                     ClosingDate = palletSelect.p.ClosingDate,
                     SendingDate = palletSelect.p.SendingDate,
                     Status = palletSelect.p.Status,
                     CurrentCountSkins = palletSelect.p.CurrentCountSkins,
-                    IdTypeSkin = palletSelect.p.IdTypeSkin,
+                    TypeSkinID = palletSelect.p.TypeSkinID,
                     SkinTypeLabel = palletSelect.skinType.TypeSkinLabel
                 });
             return pallet.ToList();
@@ -65,8 +66,8 @@ namespace CowSkinsService.Controllers
                 return BadRequest();
             }
 
-            _db.Pallet.Add(pallet);
-            _db.SaveChanges();
+            _context.Pallet.Add(pallet);
+            _context.SaveChanges();
             return Ok(pallet);
         }
 
@@ -78,13 +79,13 @@ namespace CowSkinsService.Controllers
             {
                 return BadRequest();
             }
-            if (!_db.Pallet.Any(x => x.IdPallet == pallet.IdPallet))
+            if (!_context.Pallet.Any(x => x.PalletID == pallet.PalletID))
             {
                 return NotFound();
             }
 
-            _db.Update(pallet);
-            _db.SaveChanges();
+            _context.Update(pallet);
+            _context.SaveChanges();
             return Ok(pallet);
         }
 
@@ -92,13 +93,13 @@ namespace CowSkinsService.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            Pallet pallet = _db.Pallet.FirstOrDefault(x => x.IdPallet == id);
+            Pallet pallet = _context.Pallet.FirstOrDefault(x => x.PalletID == id);
             if (pallet == null)
             {
                 return NotFound();
             }
-            _db.Pallet.Remove(pallet);
-            _db.SaveChanges();
+            _context.Pallet.Remove(pallet);
+            _context.SaveChanges();
             return Ok(pallet);
         }
     }

@@ -10,19 +10,20 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CowSkinsService.Controllers
 {
+    [ApiController]
     [Route("api/[controller]/[action]")]
-    public class SchemeTypesController : Controller
+    public class SchemeTypesController : ControllerBase
     {
-        SkinsContext db;
+        SkinsContext _context;
         public SchemeTypesController(SkinsContext context)
         {
-            db = context;
+            _context = context;
         }
         // GET: api/values
         [HttpGet]
         public IEnumerable<SchemeType> Get()
         {
-            return db.SchemeType.ToList();
+            return _context.SchemeType.ToList();
         }
 
 
@@ -30,7 +31,7 @@ namespace CowSkinsService.Controllers
         [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
-            SchemeType schemeType = db.SchemeType.FirstOrDefault(x => x.IdSchemeType == id);
+            SchemeType schemeType = _context.SchemeType.FirstOrDefault(x => x.SchemeTypeID == id);
             if (schemeType == null)
                 return NotFound();
             return new ObjectResult(schemeType);
@@ -46,8 +47,8 @@ namespace CowSkinsService.Controllers
                 return BadRequest();
             }
 
-            db.SchemeType.Add(schemeType);
-            db.SaveChanges();
+            _context.SchemeType.Add(schemeType);
+            _context.SaveChanges();
             return Ok(schemeType);
         }
 
@@ -61,13 +62,13 @@ namespace CowSkinsService.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            SchemeType schemeType = db.SchemeType.FirstOrDefault(x => x.IdSchemeType == id);
+            SchemeType schemeType = _context.SchemeType.FirstOrDefault(x => x.SchemeTypeID == id);
             if (schemeType == null)
             {
                 return NotFound();
             }
-            db.SchemeType.Remove(schemeType);
-            db.SaveChanges();
+            _context.SchemeType.Remove(schemeType);
+            _context.SaveChanges();
             return Ok(schemeType);
         }
     }

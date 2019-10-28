@@ -10,26 +10,27 @@ using CowSkinsService.DAL;
 
 namespace CowSkinsService.Controllers
 {
+    [ApiController]
     [Route("api/[controller]/[action]")]
-    public class CostJournalsController : Controller
+    public class CostJournalsController : ControllerBase
     {
-        private readonly SkinsContext _db;
+        private readonly SkinsContext _context;
         public CostJournalsController(SkinsContext context)
         {
-            _db = context;
+            _context = context;
         }
         // GET: api/values
         [HttpGet]
         public IEnumerable<CostJournal> Get()
         {
-            return _db.CostJournal.ToList();
+            return _context.CostJournal.ToList();
         }
 
         // GET api/values/5
         [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
-            CostJournal costJournal = _db.CostJournal.FirstOrDefault(x => x.IdCost == id);
+            CostJournal costJournal = _context.CostJournal.FirstOrDefault(x => x.CostID == id);
             if (costJournal == null)
                 return NotFound();
             return new ObjectResult(costJournal);
@@ -44,8 +45,8 @@ namespace CowSkinsService.Controllers
                 return BadRequest();
             }
 
-            _db.CostJournal.Add(costJournal);
-            _db.SaveChanges();
+            _context.CostJournal.Add(costJournal);
+            _context.SaveChanges();
             return Ok(costJournal);
         }
 
@@ -59,41 +60,41 @@ namespace CowSkinsService.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            CostJournal costJournal = _db.CostJournal.FirstOrDefault(x => x.IdCost == id);
+            CostJournal costJournal = _context.CostJournal.FirstOrDefault(x => x.CostID == id);
             if (costJournal == null)
             {
                 return NotFound();
             }
-            _db.CostJournal.Remove(costJournal);
-            _db.SaveChanges();
+            _context.CostJournal.Remove(costJournal);
+            _context.SaveChanges();
             return Ok(costJournal);
         }
 
         [HttpGet]
         public IEnumerable<Skin> GetBatch()
         {
-            var closedBatchIdList = _db.Batch.Where(b => b.BatchStatus == "Закрыта").Select(b => b.IdBatch);
+            var closedBatchIdList = _context.Batch.Where(b => b.BatchStatus == "Закрыта").Select(b => b.BatchID);
             List<int> ids = closedBatchIdList.ToList();
-            var skinsToCost = _db.Skin.ToList();
-            var result = skinsToCost.FindAll(s => ids.Contains(s.IdBatch.Value));
+            var skinsToCost = _context.Skin.ToList();
+            var result = skinsToCost.FindAll(s => ids.Contains(s.BatchID.Value));
             return result;
         }
 
         [HttpGet("{batchID}")]
         public IEnumerable<CostJournalAdvancedView> GetCostingByBatchId(int batchID)
         {
-            var costJournal = _db.CostJournal
-                .Join(_db.SkinType, cj => cj.IdTypeSkin, skinType => skinType.IdTypeSkin, (cj, skinType) => new { cj, skinType })
-                .Where(cj => cj.cj.IdBatch == batchID)
+            var costJournal = _context.CostJournal
+                .Join(_context.SkinType, cj => cj.TypeSkinID, skinType => skinType.TypeSkinID, (cj, skinType) => new { cj, skinType })
+                .Where(cj => cj.cj.BatchID == batchID)
                 .Select(costJoutnalSelect => new CostJournalAdvancedView()
                 {
-                    IdBatch = costJoutnalSelect.cj.IdBatch,
-                    IdCost=costJoutnalSelect.cj.IdCost,
+                    BatchID = costJoutnalSelect.cj.BatchID,
+                    CostID=costJoutnalSelect.cj.CostID,
                     CostDate =costJoutnalSelect.cj.CostDate,
-                    IdSort = costJoutnalSelect.cj.IdSort,
+                    SortID = costJoutnalSelect.cj.SortID,
                     SkinPrice = costJoutnalSelect.cj.SkinPrice,
                     TypeSkinLabel = costJoutnalSelect.skinType.TypeSkinLabel,
-                    IdTypeSkin = costJoutnalSelect.cj.IdTypeSkin
+                    TypeSkinID = costJoutnalSelect.cj.TypeSkinID
                 });
             return costJournal;
         }
@@ -101,59 +102,59 @@ namespace CowSkinsService.Controllers
         [HttpGet]
         public List<SkinType> GetTypeSkins()
         {
-            var idTypeSkin = _db.SkinType.ToList();
+            var idTypeSkin = _context.SkinType.ToList();
             return idTypeSkin;
         }
 
         [HttpGet("{batchNumber}")]
         public IEnumerable<Skin> GetSkinsinBatch(int batchNumber)
         {
-            var skins = _db.Skin.Where(s => s.IdBatch == batchNumber).OrderBy(s=>s.IdTypeSkin).ThenBy(s=>s.IdSort).ToList();
+            var skins = _context.Skin.Where(s => s.BatchID == batchNumber).OrderBy(s=>s.TypeSkinID).ThenBy(s=>s.SortID).ToList();
             return skins;
         }
 
         [HttpGet("{batchNumber}")]
-        public IEnumerable<CostingSelect> GetCurrentBatchesSkins(int batchNumber)
+        public IEnumerable<CostingAdvancedView> GetCurrentBatchesSkins(int batchNumber)
         {
-            var currentBatchesSkins = _db.Skin
-                .Join(_db.SkinType, skin => skin.IdTypeSkin, skinType => skinType.IdTypeSkin, (s, skinType) => new { s, skinType })
-               .Where(idbatch => idbatch.s.IdBatch == batchNumber)
-                .Select(sortingSelect => new CostingSelect
+            var currentBatchesSkins = _context.Skin
+                .Join(_context.SkinType, skin => skin.TypeSkinID, skinType => skinType.TypeSkinID, (s, skinType) => new { s, skinType })
+               .Where(idbatch => idbatch.s.BatchID == batchNumber)
+                .Select(sortingSelect => new CostingAdvancedView
                 {
-                    IdBatch = sortingSelect.s.IdBatch,
-                    IdTypeSkin = sortingSelect.s.IdTypeSkin,
-                    IdSort = sortingSelect.s.IdSort,
+                    BatchID = sortingSelect.s.BatchID,
+                    TypeSkinID = sortingSelect.s.TypeSkinID,
+                    SortID = sortingSelect.s.SortID,
                     Brutto = sortingSelect.s.Brutto,
                     Discount = sortingSelect.s.Discount,
-                    IdConfiguration = sortingSelect.s.IdConfiguration,
-                    IdPallet = sortingSelect.s.IdPallet,
-                    IdSkin = sortingSelect.s.IdSkin,
+                    ConfigurationID = sortingSelect.s.ConfigurationID,
+                    PalletID = sortingSelect.s.PalletID,
+                    SkinID = sortingSelect.s.SkinID,
                     Netto = sortingSelect.s.Netto,
                     SkinTypeLabel = sortingSelect.skinType.TypeSkinLabel
-                }).OrderBy(s => s.IdTypeSkin).ThenBy(s => s.IdSort);
+                }).OrderBy(s => s.TypeSkinID).ThenBy(s => s.SortID);
 
             return currentBatchesSkins.ToList();
         }
 
         [HttpGet("{batchNumber}")]
-        public IEnumerable<CostingSelect> GetCurrentBatchesDistinctSkins(int batchNumber)
+        public IEnumerable<CostingAdvancedView> GetCurrentBatchesDistinctSkins(int batchNumber)
         {
-            var currentBatchesSkins = _db.Skin
-                .Join(_db.SkinType, skin => skin.IdTypeSkin, skinType => skinType.IdTypeSkin, (s, skinType) => new { s, skinType })
-                .Where(idbatch => idbatch.s.IdBatch == batchNumber)
-                .Select(sortingSelect => new CostingSelect
+            var currentBatchesSkins = _context.Skin
+                .Join(_context.SkinType, skin => skin.TypeSkinID, skinType => skinType.TypeSkinID, (s, skinType) => new { s, skinType })
+                .Where(idbatch => idbatch.s.BatchID == batchNumber)
+                .Select(sortingSelect => new CostingAdvancedView
                 {
-                    IdBatch = sortingSelect.s.IdBatch,
-                    IdTypeSkin = sortingSelect.s.IdTypeSkin,
-                    IdSort = sortingSelect.s.IdSort,
+                    BatchID = sortingSelect.s.BatchID,
+                    TypeSkinID = sortingSelect.s.TypeSkinID,
+                    SortID = sortingSelect.s.SortID,
                     Brutto = sortingSelect.s.Brutto,
                     Discount = sortingSelect.s.Discount,
-                    IdConfiguration = sortingSelect.s.IdConfiguration,
-                    IdPallet = sortingSelect.s.IdPallet,
-                    IdSkin = sortingSelect.s.IdSkin,
+                    ConfigurationID = sortingSelect.s.ConfigurationID,
+                    PalletID = sortingSelect.s.PalletID,
+                    SkinID = sortingSelect.s.SkinID,
                     Netto = sortingSelect.s.Netto,
                     SkinTypeLabel = sortingSelect.skinType.TypeSkinLabel
-                }).OrderBy(s => s.IdTypeSkin).ThenBy(s => s.IdSort).Distinct((skin, skin1) => skin.IdTypeSkin == skin1.IdTypeSkin).OrderBy(s => s.IdTypeSkin).ThenBy(s => s.IdSort);
+                }).OrderBy(s => s.TypeSkinID).ThenBy(s => s.SortID).Distinct((skin, skin1) => skin.TypeSkinID == skin1.TypeSkinID).OrderBy(s => s.TypeSkinID).ThenBy(s => s.SortID);
 
             return currentBatchesSkins.ToList();
         }
