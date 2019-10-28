@@ -1,6 +1,6 @@
 using System;
 
-namespace CowSkinsServices
+namespace CowSkinsService
 {
     public class WeatherForecast
     {
